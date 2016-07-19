@@ -1,0 +1,13 @@
+ProxyMode=0
+Server=ip_server
+Hostname=nome_server
+LogFile=/tmp/zabbix_proxy.log
+LogFileSize=2
+DebugLevel=3
+PidFile=/tmp/zabbix_proxy.pid
+DBName=/var/lib/sqlite3/zabbix.db
+ProxyOfflineBuffer=2
+DataSenderFrequency=1
+StartIPMIPollers=1
+Timeout=3
+FpingLocation=/usr/bin/fping

@@ -1,0 +1,70 @@
+#!/bin/bash
+NOME_SERVER=`hostname`
+echo "Insra o IP do Servidor :"
+read IP_SERVER
+echo "Instalando as dependências...."
+sleep 3
+
+apt-get -y install build-essential snmp vim libssh2-1-dev libssh2-1 libopenipmi-dev libsnmp-dev wget libcurl4-gnutls-dev fping libxml2 libxml2-dev curl libcurl3-gnutls libcurl3-gnutls-dev libiksemel-dev libiksemel-utils libiksemel3 sqlite3 libsqlite3-dev
+
+echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" >> /etc/apt/sources.list
+
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+
+apt-get update
+
+apt-get -y install oracle-java8-installer oracle-java8-set-default
+
+echo "Fazendo Download do zabbix proxy..."
+sleep 3
+
+VERSAO=3.0.3
+export VERSAO
+cd /tmp
+wget http://downloads.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/$VERSAO/zabbix-$VERSAO.tar.gz
+tar xzvf zabbix-$VERSAO.tar.gz
+chmod -R +x zabbix-$VERSAO
+cd zabbix-$VERSAO/database/sqlite3/
+
+echo "Povoando o banco de dados.."
+sleep 3
+
+mkdir /var/lib/sqlite3/
+sqlite3 /var/lib/sqlite3/zabbix.db < schema.sql
+chown -R zabbix:zabbix /var/lib/sqlite3/
+cd /tmp/zabbix-$VERSAO
+
+echo "Instalando o zabbix proxy ....."
+
+sleep 3
+
+./configure --enable-proxy --enable-agent --enable-java --with-sqlite3 --with-net-snmp --with-libcurl=/usr/bin/curl-config --with-ssh2 --with-openipmi
+make install
+
+echo "Criando os arquivos de configuração e scripts..."
+sleep 3
+
+cd /home/zabbix/bash
+sed -i "s/ip_server/$IP_SERVER/g" agente.txt
+sed -i "s/nome_server/$HOSTNAME/g" agente.txt
+sed -i "s/ip_server/$IP_SERVER/g" proxy.txt
+sed -i "s/nome_server/$HOSTNAME/g" proxy.txt
+
+mv /usr/local/etc/zabbix_agentd.conf /usr/local/etc/zabbix_agentd.conf.old
+cat /home/zabbix/bash/agente.txt > /usr/local/etc/zabbix_agentd.conf
+mv /usr/local/etc/zabbix_proxy.conf /usr/local/etc/zabbix_proxy.conf.old
+cat /home/zabbix/bash/proxy.txt > /usr/local/etc/zabbix_proxy.conf
+
+mv /home/zabbix/bash/agente.sh /etc/init.d/zabbix_agentd
+chmod +x /etc/init.d/zabbix_agentd
+mv /home/zabbix/bash/proxy.sh /etc/init.d/zabbyx_proxy
+chmod +x /etc/init.d/zabbyx_proxy
+
+Echo "Vou iniciar os serviços..."
+sleep 3
+
+/etc/init.d/zabbyx_proxy start
+/etc/init.d/zabbix_agentd start
+
+echo "Zabix  proxy instalado com sucesso ..."
+

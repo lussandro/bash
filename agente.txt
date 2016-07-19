@@ -1,0 +1,7 @@
+PidFile=/tmp/zabbix_agentd.pid
+LogFile=/tmp/zabbix_agentd.log
+LogFileSize=2
+DebugLevel=3
+Server=ip_server
+ListenPort=10050
+Hostname=nome_server
