@@ -1,5 +1,5 @@
 ProxyMode=0
-Server=ip_server
+Server=187.94.98.118
 Hostname=nome_server
 LogFile=/tmp/zabbix_proxy.log
 LogFileSize=2

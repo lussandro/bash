@@ -47,7 +47,6 @@ sleep 3
 cd /home/zabbix/bash
 sed -i "s/ip_server/$IP_SERVER/g" agente.txt
 sed -i "s/nome_server/$HOSTNAME/g" agente.txt
-sed -i "s/ip_server/$IP_SERVER/g" proxy.txt
 sed -i "s/nome_server/$HOSTNAME/g" proxy.txt
 
 mv /usr/local/etc/zabbix_agentd.conf /usr/local/etc/zabbix_agentd.conf.old
@@ -57,13 +56,13 @@ cat /home/zabbix/bash/proxy.txt > /usr/local/etc/zabbix_proxy.conf
 
 mv /home/zabbix/bash/agente.sh /etc/init.d/zabbix_agentd
 chmod +x /etc/init.d/zabbix_agentd
-mv /home/zabbix/bash/proxy.sh /etc/init.d/zabbyx_proxy
-chmod +x /etc/init.d/zabbyx_proxy
+mv /home/zabbix/bash/proxy.sh /etc/init.d/zabbix_proxy
+chmod +x /etc/init.d/zabbix_proxy
 
 Echo "Vou iniciar os serviços..."
 sleep 3
 
-/etc/init.d/zabbyx_proxy start
+/etc/init.d/zabbix_proxy start
 /etc/init.d/zabbix_agentd start
 
 echo "Zabix  proxy instalado com sucesso ..."
