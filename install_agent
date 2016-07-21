@@ -1,0 +1,47 @@
+#!/bin/bash
+NOME_SERVER=`hostname`
+echo "Insra o IP do Servidor :"
+read IP_SERVER
+echo "Instalando as dependências...."
+sleep 3
+
+apt-get -y install build-essential snmp vim libssh2-1-dev libssh2-1libopenipmi-dev libsnmp-dev wget libcurl4-gnutls-dev fping curl libcurl3-gnutls libcurl3-gnutls-dev libiksemel-dev libiksemel-utils libiksemel3 sudo
+
+echo "Fazendo Download do zabbix proxy..."
+sleep 3
+
+VERSAO=3.0.3
+export VERSAO
+cd /tmp
+wget http://downloads.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/$VERSAO/zabbix-$VERSAO.tar.gz
+tar xzvf zabbix-$VERSAO.tar.gz
+chmod -R +x zabbix-$VERSAO
+
+echo "Instalando o zabbix agent ....."
+sleep 3
+
+
+cd zabbix-$VERSAO
+./configure --enable-agent --with-net-snmp --with-libcurl=/usr/bin/curlconfig --with-ssh2 --with-openipmi
+make install
+
+echo "Criando os arquivos de configuração e scripts..."
+sleep 3
+
+cd /home/admin/bash
+sed -i "s/ip_server/$IP_SERVER/g" agente.txt
+sed -i "s/nome_server/$HOSTNAME/g" agente.txt
+
+mv /usr/local/etc/zabbix_agentd.conf /usr/local/etc/zabbix_agentd.conf.old
+cat /home/zabbix/bash/agente.txt > /usr/local/etc/zabbix_agentd.conf
+
+mv /home/zabbix/bash/agente.sh /etc/init.d/zabbix_agentd
+chmod +x /etc/init.d/zabbix_agentd
+
+Echo "Vou iniciar os serviços..."
+sleep 3
+
+/etc/init.d/zabbix_agentd start
+
+echo "Zabix agent instalado com sucesso ..."
+
